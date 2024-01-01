@@ -115,6 +115,17 @@ export function findFirstSpace() {
 	return min;
 }
 
+const compare = (a: boolean, b: boolean) => {
+	let aVal = a ? 1 : 0;
+	let bVal = b ? 1 : 0;
+
+	if (aVal > bVal) {
+		return 1;
+	} else {
+		return 0;
+	}
+};
+
 export function findWords() {
 	let words: Word[] = [];
 	//Start by finding each tile that is the start of a word
@@ -168,6 +179,15 @@ export function findWords() {
 			});
 		}
 	});
+
+	words.sort(function (x, y) {
+		// true values first
+		return x.isWord === y.isWord ? 0 : x.isWord ? -1 : 1;
+		// false values first
+		// return (x === y)? 0 : x? 1 : -1;
+	});
+
+	console.log(words);
 
 	return words;
 }

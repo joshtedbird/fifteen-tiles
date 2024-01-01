@@ -61,6 +61,11 @@
 <div class="container">
 	<!-- @ts-ignore -->
 	<svg class="grid-canvas" viewBox={$area}>
+		<defs>
+			<filter id="blend">
+				<feBlend in="SourceGraphic" in2="floodFill" mode="multiply" />
+			</filter>
+		</defs>
 		<!-- WORD BARS -->
 		{#each $words as word}
 			<rect
@@ -121,5 +126,8 @@
 		position: absolute;
 		top: 0;
 		left: 0;
+	}
+	.blend {
+		mix-blend-mode: soft-light;
 	}
 </style>
