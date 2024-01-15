@@ -1,29 +1,29 @@
-import type { BankObject, BoundingBox, Coord, GridObject, Word } from './types';
+import type { BankObject, BoundingBox, Coord, Corner, GridObject, Word } from './types';
 import { get } from 'svelte/store';
-import { tiles, letters, numTiles } from './store';
-import { letterBag } from './data';
+import { tiles, letters, numTiles, spaces, words } from './store';
+import { letterDist } from './data';
 import dictionary from './dictionary.json';
 
 const GRID_SIZE = 10;
 export const scale = (n: number) => n * GRID_SIZE;
 
-export function getArea(bbox: BoundingBox) {
+export function getArea(bbox: BoundingBox, size: number) {
 	let left = 0;
 	let top = 0;
 
 	let width = bbox.bottomRight.x - bbox.topLeft.x;
 	let height = bbox.bottomRight.y - bbox.topLeft.y;
 
-	if (width < 5) {
-		left = bbox.topLeft.x - (5 - width) / 2;
-		width = 5;
+	if (width < size) {
+		left = bbox.topLeft.x - (size - width) / 2;
+		width = size;
 	} else {
 		left = bbox.topLeft.x;
 	}
 
-	if (height < 5) {
-		top = bbox.topLeft.y - (5 - height) / 2;
-		height = 5;
+	if (height < size) {
+		top = bbox.topLeft.y - (size - height) / 2;
+		height = size;
 	} else {
 		top = bbox.topLeft.y;
 	}
@@ -70,12 +70,122 @@ export function genSpaces() {
 	return output;
 }
 
+function findWordTiles() {
+	const checkWords = get(words);
+	console.log('words list: ', checkWords);
+	let output: Coord[] = [];
+
+	checkWords.forEach((word) => {
+		if (word.isWord) {
+			for (let i = 0; i < word.value.length; i++) {
+				output.push(
+					word.dir === 'across' ? { x: word.x + i, y: word.y } : { x: word.x, y: word.y + i }
+				);
+			}
+		}
+	});
+
+	return output;
+}
+
+function checkNeighbour(x: number, y: number, wordTiles: Coord[]) {
+	return wordTiles.filter((d) => d.x === x && d.y === y).length;
+}
+
+export function genCorners() {
+	const checkSpaces = get(spaces);
+
+	const wordTiles: Coord[] = findWordTiles();
+
+	console.log(wordTiles);
+
+	let output: Corner[] = [];
+
+	checkSpaces.forEach((d) => {
+		//NW
+		if (
+			checkNeighbour(d.x - 1, d.y, wordTiles) &&
+			checkNeighbour(d.x - 1, d.y - 1, wordTiles) &&
+			checkNeighbour(d.x, d.y - 1, wordTiles)
+		) {
+			output.push({ ...d, dir: 'nw' });
+		}
+
+		//NE
+		if (
+			checkNeighbour(d.x + 1, d.y, wordTiles) &&
+			checkNeighbour(d.x + 1, d.y - 1, wordTiles) &&
+			checkNeighbour(d.x, d.y - 1, wordTiles)
+		) {
+			output.push({ ...d, dir: 'ne' });
+		}
+		//SE
+		if (
+			checkNeighbour(d.x + 1, d.y, wordTiles) &&
+			checkNeighbour(d.x + 1, d.y + 1, wordTiles) &&
+			checkNeighbour(d.x, d.y + 1, wordTiles)
+		) {
+			output.push({ ...d, dir: 'se' });
+		}
+
+		//SW
+		if (
+			checkNeighbour(d.x - 1, d.y, wordTiles) &&
+			checkNeighbour(d.x - 1, d.y + 1, wordTiles) &&
+			checkNeighbour(d.x, d.y + 1, wordTiles)
+		) {
+			output.push({ ...d, dir: 'sw' });
+		}
+	});
+
+	return output;
+}
+
 export function genLetters(n: number) {
+	let letterBag = [...letterDist];
+	let letters: string[] = [];
 	let output: BankObject[] = [];
+
 	for (let i = 0; i < n; i++) {
+		//Randomly pull a letter from the bag
+
 		let index = Math.floor(Math.random() * letterBag.length);
-		output.push({ value: letterBag[index], id: i, position: i });
+
+		// console.log('LETTER: ', letterBag[index]);
+
+		//Check for Q
+		if (letterBag[index] === 'Q') {
+			//Check if a U already has been added
+			if (letters.filter((d) => d === 'U').length === 0) {
+				//Check if this is the last tile pulled
+				if (i !== n - 1) {
+					letters.push(letterBag[index], 'U');
+					//Remove said letter from the bag
+					letterBag.splice(index, 1);
+
+					//Find a U to remove
+					letterBag.splice(letterBag.indexOf('U'), 1);
+					i++;
+				} else {
+					// console.log('skipped because last');
+					i--;
+				}
+			} else {
+				// console.log('Q added with prior U existing');
+				letters.push(letterBag[index]);
+				//Remove said letter from the bag
+				letterBag.splice(index, 1);
+			}
+		} else {
+			letters.push(letterBag[index]);
+			//Remove said letter from the bag
+			letterBag.splice(index, 1);
+		}
+		// console.log('REMAINING: ', letterBag);
 	}
+
+	letters.sort();
+	output = letters.map((l, i) => ({ value: l, id: i, position: i }));
 
 	return output;
 }
@@ -114,17 +224,6 @@ export function findFirstSpace() {
 
 	return min;
 }
-
-const compare = (a: boolean, b: boolean) => {
-	let aVal = a ? 1 : 0;
-	let bVal = b ? 1 : 0;
-
-	if (aVal > bVal) {
-		return 1;
-	} else {
-		return 0;
-	}
-};
 
 export function findWords() {
 	let words: Word[] = [];
@@ -186,8 +285,6 @@ export function findWords() {
 		// false values first
 		// return (x === y)? 0 : x? 1 : -1;
 	});
-
-	console.log(words);
 
 	return words;
 }

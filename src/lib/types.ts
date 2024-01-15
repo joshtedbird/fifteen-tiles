@@ -23,4 +23,6 @@ export type Word = Coord & {
 	isWord: boolean;
 };
 
+export type Corner = Coord & { dir: 'nw' | 'ne' | 'se' | 'sw' };
+
 // export type Word = GridObject & { dir: "across" | "down" }
