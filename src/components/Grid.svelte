@@ -123,10 +123,10 @@
 		{#each $corners as corner}
 			<svg
 				x={corner.dir === 'nw' || corner.dir === 'sw'
-					? scale(corner.x - 0.001)
+					? scale(corner.x - 0.004)
 					: scale(corner.x + 0.806)}
 				y={corner.dir === 'nw' || corner.dir === 'ne'
-					? scale(corner.y - 0.001)
+					? scale(corner.y - 0.004)
 					: scale(corner.y + 0.806)}
 				width={2}
 				height={2}
