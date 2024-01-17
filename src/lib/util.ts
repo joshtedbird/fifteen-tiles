@@ -72,7 +72,6 @@ export function genSpaces() {
 
 function findWordTiles() {
 	const checkWords = get(words);
-	console.log('words list: ', checkWords);
 	let output: Coord[] = [];
 
 	checkWords.forEach((word) => {
@@ -96,8 +95,6 @@ export function genCorners() {
 	const checkSpaces = get(spaces);
 
 	const wordTiles: Coord[] = findWordTiles();
-
-	console.log(wordTiles);
 
 	let output: Corner[] = [];
 
@@ -141,7 +138,7 @@ export function genCorners() {
 	return output;
 }
 
-export function genLetters(n: number) {
+export function genLetters(n: number, rand: () => number) {
 	let letterBag = [...letterDist];
 	let letters: string[] = [];
 	let output: BankObject[] = [];
@@ -149,7 +146,7 @@ export function genLetters(n: number) {
 	for (let i = 0; i < n; i++) {
 		//Randomly pull a letter from the bag
 
-		let index = Math.floor(Math.random() * letterBag.length);
+		let index = Math.floor(rand() * letterBag.length);
 
 		// console.log('LETTER: ', letterBag[index]);
 
@@ -287,4 +284,65 @@ export function findWords() {
 	});
 
 	return words;
+}
+
+function reportAllNeighbours(tile: GridObject, foundTiles: GridObject[]) {
+	let newTiles: GridObject[] = [];
+
+	//NORTH
+	if (getTile(tile.x, tile.y - 1).length) {
+		let northTile = getTile(tile.x, tile.y - 1)[0];
+		if (!foundTiles.filter((d) => d.x === northTile.x && d.y === northTile.y).length) {
+			newTiles.push(northTile);
+		}
+	}
+
+	//EAST
+	if (getTile(tile.x + 1, tile.y).length) {
+		let northTile = getTile(tile.x + 1, tile.y)[0];
+		if (!foundTiles.filter((d) => d.x === northTile.x && d.y === northTile.y).length) {
+			newTiles.push(northTile);
+		}
+	}
+
+	//SOUTH
+	if (getTile(tile.x, tile.y + 1).length) {
+		let northTile = getTile(tile.x, tile.y + 1)[0];
+		if (!foundTiles.filter((d) => d.x === northTile.x && d.y === northTile.y).length) {
+			newTiles.push(northTile);
+		}
+	}
+
+	//WEST
+	if (getTile(tile.x - 1, tile.y).length) {
+		let northTile = getTile(tile.x - 1, tile.y)[0];
+		if (!foundTiles.filter((d) => d.x === northTile.x && d.y === northTile.y).length) {
+			newTiles.push(northTile);
+		}
+	}
+
+	let newFoundTiles = [...foundTiles, ...newTiles];
+
+	newTiles.forEach((d) => {
+		newFoundTiles = reportAllNeighbours(d, newFoundTiles);
+	});
+
+	return newFoundTiles;
+}
+
+export function checkCompletion() {
+	const allWords = !get(words).filter((d) => !d.isWord).length;
+	const noIslands = reportAllNeighbours(get(tiles)[0], [get(tiles)[0]]).length === numTiles;
+
+	return allWords && noIslands;
+}
+
+function zeroPadded(number: number) {
+	return number >= 10 ? number.toString() : `0${number}`;
+}
+
+export function formatTime(seconds: number) {
+	const mm = Math.floor(seconds / 60);
+	const ss = zeroPadded(Math.floor(seconds) % 60);
+	return `${mm}:${ss}`;
 }

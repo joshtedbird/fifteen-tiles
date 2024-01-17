@@ -1,10 +1,13 @@
 <script lang="ts">
 	import Grid from '../components/Grid.svelte';
 	import TileBank from '../components/TileBank.svelte';
+	import '@fontsource/dm-mono/400.css';
 	import '@fontsource/dm-mono/500.css';
+	import UtilBar from '../components/UtilBar.svelte';
 
 	$: innerHeight = 0;
 	$: innerWidth = 0;
+
 	$: isLandscape = innerWidth > 645;
 </script>
 
@@ -12,6 +15,7 @@
 
 <main>
 	<div class="wrapper" style="--innerHeight:{innerHeight}">
+		<UtilBar {isLandscape} />
 		<Grid {isLandscape} />
 		<TileBank {isLandscape} />
 	</div>

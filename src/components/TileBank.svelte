@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { letters, selected, numTiles } from '../lib/store';
-	import { shuffleTiles } from '../lib/util';
+	import { letters, selected } from '../lib/store';
+	import { checkCompletion, shuffleTiles } from '../lib/util';
 	import Icon from './Icon.svelte';
 	import type { BankObject } from '../lib/types';
 
@@ -19,6 +19,15 @@
 	function shuffle() {
 		letters.set(shuffleTiles());
 	}
+
+	let solved = false;
+
+	$: if (!$letters.length) {
+		solved = checkCompletion();
+		console.log('solved ?', solved);
+	} else {
+		solved = false;
+	}
 </script>
 
 <div class="area" class:area-landscape={isLandscape}>
@@ -36,9 +45,14 @@
 				class:tile-landscape={isLandscape}><span class="unselectable">{letter.value}</span></button
 			>
 		{/each}
-		<button class="iconButton" class:iconButton-landscape={isLandscape} on:click={() => shuffle()}
-			><Icon name="shuffle" /></button
-		>
+		{#if $letters.length}
+			<button class="iconButton" class:iconButton-landscape={isLandscape} on:click={() => shuffle()}
+				><Icon name="shuffle" /></button
+			>
+		{/if}
+		{#if solved}
+			<button class="tile submitButton">submit</button>
+		{/if}
 	</div>
 </div>
 
@@ -133,5 +147,16 @@
 		top: 1rem;
 		right: -3.5rem;
 		transition: opacity 0.2s;
+	}
+	.submitButton {
+		grid-row: 2;
+		grid-column-start: 2;
+		grid-column-end: 5;
+
+		background-color: #a7d4aa;
+		aspect-ratio: auto;
+
+		color: white;
+		font-size: 1.25rem;
 	}
 </style>

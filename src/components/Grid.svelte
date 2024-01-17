@@ -3,7 +3,15 @@
 	import { fade } from 'svelte/transition';
 	import { tiles, selected, spaces, letters, words, corners } from '../lib/store';
 	import { cubicInOut } from 'svelte/easing';
-	import { getArea, scale, genSpaces, findFirstSpace, findWords, genCorners } from '../lib/util';
+	import {
+		getArea,
+		scale,
+		genSpaces,
+		findFirstSpace,
+		findWords,
+		genCorners,
+		checkCompletion
+	} from '../lib/util';
 	import type { GridObject } from '../lib/types';
 
 	export let isLandscape: boolean;
@@ -35,6 +43,8 @@
 			spaces.set(genSpaces());
 			words.set(findWords());
 			corners.set(genCorners());
+
+			checkCompletion();
 		}
 	}
 
@@ -65,6 +75,8 @@
 	};
 
 	$: area.set(getArea(boundingBox, isLandscape ? 9 : 5));
+
+	const DEBUG = false;
 </script>
 
 <div class="container">
@@ -101,6 +113,9 @@
 				font-weight="500"
 				text-anchor="middle">{tile.value ? tile.value : ''}</text
 			>
+			{#if DEBUG}
+				<text font-size="1.5" x={scale(tile.x + 0.75)} y={scale(tile.y + 0.85)}>{tile.id}</text>
+			{/if}
 		{/each}
 		{#if $selected}
 			<g transition:fade={{ duration: 100 }}>
