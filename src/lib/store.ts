@@ -3,7 +3,7 @@ import { type GridObject, type BankObject, type Coord, type Word, type Corner } 
 import { genLetters } from './util';
 import { createRand, genSeed } from './rand';
 
-const date = new Date().toLocaleDateString('en-GB');
+const date = new Date().toISOString().slice(0, 10);
 
 export const isLandscape = writable<boolean>(false);
 
@@ -26,3 +26,5 @@ export const words = writable<Word[]>([]);
 export const time = writable<number>(0);
 
 export const paused = writable<boolean>(false);
+
+export const solved = writable<boolean>(false);

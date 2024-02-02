@@ -47,6 +47,7 @@
 		color: rgba(0, 0, 0, 0.5);
 		align-items: center;
 		position: relative;
+		z-index: 30;
 	}
 	span {
 		user-select: none;

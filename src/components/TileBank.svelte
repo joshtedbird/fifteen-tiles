@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { letters, selected } from '../lib/store';
+	import { letters, selected, solved } from '../lib/store';
 	import { checkCompletion, shuffleTiles } from '../lib/util';
 	import Icon from './Icon.svelte';
 	import type { BankObject } from '../lib/types';
@@ -20,14 +20,19 @@
 		letters.set(shuffleTiles());
 	}
 
-	let solved = false;
+	let isSolved = false;
 
 	$: if (!$letters.length) {
-		solved = checkCompletion();
-		console.log('solved ?', solved);
+		isSolved = checkCompletion();
 	} else {
-		solved = false;
+		isSolved = false;
 	}
+
+	const submit = () => {
+		if (isSolved) {
+			solved.set(true);
+		}
+	};
 </script>
 
 <div class="area" class:area-landscape={isLandscape}>
@@ -50,8 +55,8 @@
 				><Icon name="shuffle" /></button
 			>
 		{/if}
-		{#if solved}
-			<button class="tile submitButton">submit</button>
+		{#if isSolved}
+			<button class="tile submitButton" on:click={() => submit()}>submit</button>
 		{/if}
 	</div>
 </div>
@@ -158,5 +163,6 @@
 
 		color: white;
 		font-size: 1.25rem;
+		font-weight: 400;
 	}
 </style>

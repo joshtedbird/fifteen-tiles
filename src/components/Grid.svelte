@@ -17,7 +17,7 @@
 	export let isLandscape: boolean;
 
 	const area = tweened(
-		[...getArea({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } }, isLandscape ? 9 : 5)],
+		[...getArea({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } }, isLandscape ? 8 : 5)],
 		{
 			easing: cubicInOut,
 			duration: 800
@@ -74,7 +74,7 @@
 		}
 	};
 
-	$: area.set(getArea(boundingBox, isLandscape ? 9 : 5));
+	$: area.set(getArea(boundingBox, isLandscape ? 8 : 5));
 
 	const DEBUG = false;
 </script>
