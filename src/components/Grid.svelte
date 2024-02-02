@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tweened } from 'svelte/motion';
 	import { fade } from 'svelte/transition';
-	import { tiles, selected, spaces, letters, words, corners } from '../lib/store';
+	import { tiles, selected, spaces, letters, words, corners, solved } from '../lib/store';
 	import { cubicInOut } from 'svelte/easing';
 	import {
 		getArea,
@@ -156,6 +156,12 @@
 				</g>
 			</svg>
 		{/each}
+
+		<!-- {#if $solved}
+			<text font-size="0.25rem" y={$area[1]} x={$area[0] + $area[2] / 2} text-anchor="middle"
+				>1:22</text
+			>
+		{/if} -->
 	</svg>
 </div>
 

@@ -6,6 +6,7 @@
 	import UtilBar from '../components/UtilBar.svelte';
 	import { paused, solved } from '$lib/store';
 	import { fade } from 'svelte/transition';
+	import EndScreen from '../components/EndScreen.svelte';
 
 	$: innerHeight = 0;
 	$: innerWidth = 0;
@@ -23,11 +24,13 @@
 
 		<Grid {isLandscape} />
 
-		{#if !$solved}
-			<TileBank {isLandscape} />
-		{:else}
-			Solved
-		{/if}
+		<div class="ui" class:ui-landscape={isLandscape}>
+			{#if !$solved}
+				<TileBank {isLandscape} />
+			{:else}
+				<EndScreen {isLandscape} />
+			{/if}
+		</div>
 		{#if $paused}
 			<div transition:fade={{ duration: 100 }} class="overlay">paused</div>
 		{/if}
@@ -61,5 +64,19 @@
 
 		color: #888;
 		font-size: 1.4rem;
+	}
+	.ui {
+		width: 100%;
+		aspect-ratio: 5/3;
+
+		border-top: 1px solid rgba(0, 0, 0, 0.05);
+		position: relative;
+	}
+	.ui-landscape {
+		aspect-ratio: auto;
+		border: none;
+		margin-bottom: 8rem;
+		display: flex;
+		justify-content: center;
 	}
 </style>

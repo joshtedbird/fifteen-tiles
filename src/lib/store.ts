@@ -5,8 +5,6 @@ import { createRand, genSeed } from './rand';
 
 const date = new Date().toISOString().slice(0, 10);
 
-export const isLandscape = writable<boolean>(false);
-
 export const numTiles = 15;
 
 export const tiles = writable<GridObject[]>([]);

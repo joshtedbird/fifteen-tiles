@@ -35,47 +35,30 @@
 	};
 </script>
 
-<div class="area" class:area-landscape={isLandscape}>
-	<div class="cont" class:cont-landscape={isLandscape}>
-		{#each $letters as letter}
-			<button
-				class="tile"
-				style="grid-row-start: {Math.ceil((letter.position + 1) / 5)}; grid-row-end: {Math.ceil(
-					(letter.position + 1) / 5 + 1
-				)}; grid-column-start: {(letter.position % 5) + 1}; grid-column-end: {(letter.position %
-					5) +
-					2}"
-				on:click={() => handleSelect(letter)}
-				class:selected={$selected ? $selected.id === letter.id : false}
-				class:tile-landscape={isLandscape}><span class="unselectable">{letter.value}</span></button
-			>
-		{/each}
-		{#if $letters.length}
-			<button class="iconButton" class:iconButton-landscape={isLandscape} on:click={() => shuffle()}
-				><Icon name="shuffle" /></button
-			>
-		{/if}
-		{#if isSolved}
-			<button class="tile submitButton" on:click={() => submit()}>submit</button>
-		{/if}
-	</div>
+<div class="cont" class:cont-landscape={isLandscape}>
+	{#each $letters as letter}
+		<button
+			class="tile"
+			style="grid-row-start: {Math.ceil((letter.position + 1) / 5)}; grid-row-end: {Math.ceil(
+				(letter.position + 1) / 5 + 1
+			)}; grid-column-start: {(letter.position % 5) + 1}; grid-column-end: {(letter.position % 5) +
+				2}"
+			on:click={() => handleSelect(letter)}
+			class:selected={$selected ? $selected.id === letter.id : false}
+			class:tile-landscape={isLandscape}><span class="unselectable">{letter.value}</span></button
+		>
+	{/each}
+	{#if $letters.length}
+		<button class="iconButton" class:iconButton-landscape={isLandscape} on:click={() => shuffle()}
+			><Icon name="shuffle" /></button
+		>
+	{/if}
+	{#if isSolved}
+		<button class="tile submitButton" on:click={() => submit()}>submit</button>
+	{/if}
 </div>
 
 <style>
-	.area {
-		width: 100%;
-		aspect-ratio: 5/3;
-
-		border-top: 1px solid rgba(0, 0, 0, 0.05);
-		position: relative;
-	}
-	.area-landscape {
-		aspect-ratio: auto;
-		border: none;
-		margin-bottom: 8rem;
-		display: flex;
-		justify-content: center;
-	}
 	.cont {
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
