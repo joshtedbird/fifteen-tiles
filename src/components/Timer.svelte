@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { time, paused } from '../lib/store';
+	import { time, paused, solved } from '../lib/store';
 	import Icon from './Icon.svelte';
 	import { formatTime } from '../lib/util';
 
@@ -10,7 +10,9 @@
 	const startInterval = () => {
 		clearInterval(interval);
 		interval = setInterval(() => {
-			time.set($time + 1);
+			if (!$paused && !$solved) {
+				time.set($time + 1);
+			}
 		}, 1000);
 	};
 

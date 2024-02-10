@@ -1,7 +1,18 @@
 <script lang="ts">
 	import { formatTime } from '../lib/util';
-	import { time } from '../lib/store';
+	import { time, times } from '../lib/store';
 	export let isLandscape: boolean;
+
+	$: avgTime = $times.length ? $times.reduce((a, b) => a + b) / $times.length : 0;
+	$: minTime = $times.length ? Math.min(...$times) : 0;
+
+	$: newBest = $time === minTime;
+	$: fastTime = $time < avgTime;
+
+	const reset = () => {
+		// window.localStorage.removeItem('date');
+		// window.localStorage.removeItem('times');
+	};
 </script>
 
 <div class="cont" class:cont-landscape={isLandscape}>
@@ -9,16 +20,16 @@
 		<div class="stat-row"><h1>{formatTime($time)}</h1></div>
 		<div class="stat-row">
 			<div class="stat-box">
-				<h2>0:00</h2>
+				<h2 class:best={newBest}>{formatTime(minTime)}</h2>
 				best
 			</div>
 			<div class="stat-box">
-				<h2>0:00</h2>
+				<h2 class:best={fastTime}>{formatTime(avgTime)}</h2>
 				avg
 			</div>
 		</div>
 	</div>
-	<button>share</button>
+	<button on:click={() => reset()}>share</button>
 </div>
 
 <style>
@@ -70,6 +81,10 @@
 	h2 {
 		font-weight: 400;
 		font-size: 1.3rem;
+	}
+	.best {
+		font-weight: 500;
+		color: #45ce4f;
 	}
 	button {
 		all: unset;

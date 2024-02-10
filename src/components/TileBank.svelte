@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { letters, selected, solved } from '../lib/store';
+	import { times, letters, selected, solved, time, paused } from '../lib/store';
 	import { checkCompletion, shuffleTiles } from '../lib/util';
 	import Icon from './Icon.svelte';
 	import type { BankObject } from '../lib/types';
@@ -31,6 +31,7 @@
 	const submit = () => {
 		if (isSolved) {
 			solved.set(true);
+			times.set([$time, ...$times]);
 		}
 	};
 </script>

@@ -1,28 +1,26 @@
 <script lang="ts">
 	import { tweened } from 'svelte/motion';
 	import { fade } from 'svelte/transition';
-	import { tiles, selected, spaces, letters, words, corners, solved } from '../lib/store';
-	import { cubicInOut } from 'svelte/easing';
 	import {
-		getArea,
-		scale,
-		genSpaces,
-		findFirstSpace,
-		findWords,
-		genCorners,
-		checkCompletion
-	} from '../lib/util';
+		tiles,
+		selected,
+		spaces,
+		letters,
+		words,
+		corners,
+		solved,
+		boundingBox
+	} from '../lib/store';
+	import { cubicInOut } from 'svelte/easing';
+	import { getArea, scale, findFirstSpace, checkCompletion, genSpaces } from '../lib/util';
 	import type { GridObject } from '../lib/types';
 
 	export let isLandscape: boolean;
 
-	const area = tweened(
-		[...getArea({ topLeft: { x: 0, y: 0 }, bottomRight: { x: 1, y: 1 } }, isLandscape ? 8 : 5)],
-		{
-			easing: cubicInOut,
-			duration: 800
-		}
-	);
+	const area = tweened([...getArea($boundingBox, isLandscape ? 8 : 5)], {
+		easing: cubicInOut,
+		duration: 800
+	});
 
 	function addTile(x: number, y: number) {
 		if ($selected) {
@@ -38,11 +36,9 @@
 
 			//@ts-ignore
 			letters.set($letters.filter((d) => d.id !== $selected.id));
-			selected.set(null);
 
+			selected.set(null);
 			spaces.set(genSpaces());
-			words.set(findWords());
-			corners.set(genCorners());
 
 			checkCompletion();
 		}
@@ -57,13 +53,9 @@
 		} else {
 			spaces.set(genSpaces());
 		}
-
-		words.set(findWords());
-
-		corners.set(genCorners());
 	}
 
-	$: boundingBox = {
+	$: boundingBox.set({
 		topLeft: {
 			x: Math.min(...$tiles.map((t) => t.x), ...$spaces.map((t) => t.x)),
 			y: Math.min(...$tiles.map((t) => t.y), ...$spaces.map((t) => t.y))
@@ -72,16 +64,20 @@
 			x: Math.max(...$tiles.map((t) => t.x), ...$spaces.map((t) => t.x)) + 1,
 			y: Math.max(...$tiles.map((t) => t.y), ...$spaces.map((t) => t.y)) + 1
 		}
-	};
+	});
 
-	$: area.set(getArea(boundingBox, isLandscape ? 8 : 5));
+	$: area.set(getArea($boundingBox, isLandscape ? 8 : 5));
 
 	const DEBUG = false;
 </script>
 
 <div class="container">
 	<!-- @ts-ignore -->
-	<svg class="grid-canvas" viewBox={`${$area[0]} ${$area[1]} ${$area[2]} ${$area[3]}`}>
+	<svg
+		class="grid-canvas"
+		class:grid-disabled={$solved}
+		viewBox={`${$area[0]} ${$area[1]} ${$area[2]} ${$area[3]}`}
+	>
 		<!-- WORD BARS -->
 		{#each $words as word}
 			<rect
@@ -156,12 +152,6 @@
 				</g>
 			</svg>
 		{/each}
-
-		<!-- {#if $solved}
-			<text font-size="0.25rem" y={$area[1]} x={$area[0] + $area[2] / 2} text-anchor="middle"
-				>1:22</text
-			>
-		{/if} -->
 	</svg>
 </div>
 
@@ -194,6 +184,17 @@
 		position: absolute;
 		top: 0;
 		left: 0;
+	}
+	.grid-disabled {
+		-touch-action: none;
+		-user-select: none;
+		-webkit-touch-callout: none; /* iOS Safari */
+		-webkit-user-select: none; /* Safari */
+		-khtml-user-select: none; /* Konqueror */
+		-moz-user-select: none; /* Old version of Firefox */
+		-ms-user-select: none; /* Internet Explorer or Edge */
+		user-select: none; /* All modern browsers */
+		pointer-events: none;
 	}
 	.text {
 		pointer-events: none;
